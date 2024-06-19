@@ -67,52 +67,73 @@ class ilCmiXapiHighscoreReport
     public function initTableData()
     {
         global $DIC; /* @var \ILIAS\DI\Container $DIC */
-        
+        $members = array();
+        foreach (ilCmiXapiUser::getUsersForObject($this->obj->getId()) as $cmixUser) {
+            $this->cmixUsersByIdent[$cmixUser->getUsrIdent()] = $cmixUser;
+            ilObjCmiXapi::log()->debug('usrIdent : '.$this->cmixUsersByIdent[$cmixUser->getUsrIdent()]->getUsrId());
+            array_push($members,$cmixUser->getUsrIdent());
+        }
         $rows = [];
 
         if ($this->obj instanceof ilObjCmiXapi && $this->obj->isMixedContentType()) {
-            foreach ($this->response as $item) {
-                $userIdent = str_replace('mailto:', '', $item['mbox']);
+            ilObjCmiXapi::log()->debug('response '.$this->response.' | nb de lignes '.count($this->response).' | nb statements '.count($this->response['statements']));
+            foreach ($this->response['statements'] as $item) {
+                $userIdent = str_replace('mailto:', '', $item['actor']['mbox']);
                 if (empty($userIdent)) {
-                    $userIdent = $item['account'];
+                    $userIdent = $item['actor']['account']['name'];
                 }
                 $cmixUser = $this->cmixUsersByIdent[$userIdent];
-                $rows[] = [
+                ilObjCmiXapi::log()->debug('debut tempRow '.$userIdent.' '.$item['timestamp'].' '.$item['result']['duration'].' '.$this->fetchScore($item).' '.$cmixUser->getUsrId());
+                $tempRows[] = [
                     'user_ident' => $userIdent,
                     'user' => '',
                     'date' => $this->formatRawTimestamp($item['timestamp']),
-                    'duration' => $this->fetchTotalDuration($item['duration']),
-                    'score' => $item['score']['scaled'],
-                    'ilias_user_id' => $cmixUser->getUsrId()
-                ];
-            }
-        } elseif ($this->obj instanceof ilObjCmiXapi && $this->obj->getContentType() == ilObjCmiXapi::CONT_TYPE_CMI5) {
-            foreach ($this->response as $item) {
-                $userIdent = $item['account'];
-                $cmixUser = $this->cmixUsersByIdent[$userIdent];
-                $rows[] = [
-                    'user_ident' => $userIdent,
-                    'user' => '',
-                    'date' => $this->formatRawTimestamp($item['timestamp']),
-                    'duration' => $this->fetchTotalDuration($item['duration']),
-                    'score' => $item['score']['scaled'],
-                    'ilias_user_id' => $cmixUser->getUsrId()
-                ];
-            }
-        } else {
-            foreach ($this->response as $item) {
-                $userIdent = str_replace('mailto:', '', $item['mbox']);
-                $cmixUser = $this->cmixUsersByIdent[$userIdent];
-                $rows[] = [
-                    'user_ident' => $userIdent,
-                    'user' => '',
-                    'date' => $this->formatRawTimestamp($item['timestamp']),
-                    'duration' => $this->fetchTotalDuration($item['duration']),
-                    'score' => $item['score']['scaled'],
+                    'duration' => $this->$item['result']['duration']),
+                    'score' => $this->fetchScore($item), 
                     'ilias_user_id' => $cmixUser->getUsrId()
                 ];
             }
         }
+        } elseif ($this->obj instanceof ilObjCmiXapi && $this->obj->getContentType() == ilObjCmiXapi::CONT_TYPE_CMI5) {
+           ilObjCmiXapi::log()->debug('initTableData de hscoreReport dans elseif nb statements = '.count($this->response['statements']));
+            foreach ($this->response['statements'] as $item) {
+            ilObjCmiXapi::log()->debug('data');
+                $userIdent = $item['actor']['account']['name'];
+                ilObjCmiXapi::log()->debug('data'.$userIdent);
+                if (in_array($userIdent,$members)){
+                $cmixUser = $this->cmixUsersByIdent[$userIdent];
+                $tempRows[] = [
+                    'user_ident' => $userIdent,
+                    'user' => '',
+                    'date' => $this->formatRawTimestamp($item['timestamp']),
+                    'duration' => $this->fetchTotalDuration($item['duration']),
+                    'score' => $this->fetchScore($item), //$item['score']['scaled'],
+                    'ilias_user_id' => $cmixUser->getUsrId()
+                ];}
+            }
+        } else {
+                foreach ($this->response['statements'] as $item) {
+            ilObjCmiXapi::log()->debug('Item '.$item['actor']['mbox']);
+            $userIdent = str_replace('mailto:', '', $item['actor']['mbox']);
+            if (in_array($userIdent,$members)){
+            
+                $userIdent = str_replace('mailto:', '', $item['actor']['mbox']);
+                $cmixUser = $this->cmixUsersByIdent[$userIdent];
+                
+             //   ilObjCmiXapi::log()->debug('UserIdent '.$userIdent.' | usrId '.$cmixUser->getUsrId().'date '.$this->formatRawTimestamp($item['timestamp']).'| duration '.$item['result']['duration'].' | score '.$item['result']['score']['scaled']);
+                ilObjCmiXapi::log()->debug('scoring '.$this->fetchScore($item));
+                $tempRows[] = [
+                    'user_ident' => $userIdent,
+                    'user' => '',
+                    'date' => $this->formatRawTimestamp($item['timestamp']),
+                    'duration' => $item['result']['duration'],
+                    'score' => $this->fetchScore($item), //$item['result']['score']['scaled'],
+                    'ilias_user_id' => $cmixUser->getUsrId()
+                ];
+            }
+            }
+        }
+        $rows=$this->arrayFilter($tempRows);
         usort($rows, function ($a, $b) {
             return $a['score'] != $b['score'] ? $a['score'] > $b['score'] ? -1 : 1 : 0;
         });
@@ -148,6 +169,59 @@ class ilCmiXapiHighscoreReport
         return true;
     }
 
+private function fetchScore($statement){
+    	if ($statement['result']['score']['scaled']){
+    		return  $statement['result']['score']['scaled'];
+    		}
+    	elseif ($statement['result']['score']['raw']){
+    		return $statement['result']['score']['raw']/100;
+    		}
+    	else {
+    		return null;
+    		}
+    }
+    private function arrayFilter($tempRows){
+    	usort($tempRows, function ($a, $b) {
+            return $a['score'] != $b['score'] ? $a['score'] > $b['score'] ? -1 : 1 : 0;
+        });
+            
+            $traite=array();
+    	    foreach ($tempRows as $key => $row){
+    		$current = $row['user_ident'];
+    		//ilObjCmiXapi::log()->debug('foreach 1'.$current);
+    		$durations = array();$display=array();
+    		foreach ($tempRows as $val){
+    		ilObjCmiXapi::log()->debug('foreach 2');
+    			if ($current==$val['user_ident'] and in_array($val['user_ident'],$traite)==false){
+    				//ilObjCmiXapi::log()->debug('dans if, ajout de '.$val['duration'].' score'.$val['score']);
+    				array_push($durations,$val['duration']);	
+    				array_push($display,$key);
+    			}
+    			
+    			
+    			$totalDuration = $this->fetchTotalDuration($durations);
+    			$row['duration']=$totalDuration;
+    				
+    		}
+    		array_push($traite,$row['user_ident']);
+    	/*	
+	   ilObjCmiXapi::log()->debug('dans arrayFilter pour '.$row['user_ident'].' | total durations'.$totalDuration.' | durée enregistrée '.$row['duration'].' | score='.$row['score']);*/
+	   
+	   if (in_array($key,$display)){
+           $rows[]=['user_ident' => $row['user_ident'],
+            	'user'=> $row['user'],
+            	'date'=> $row['date'],
+            	'duration' => $row['duration'],
+            	'score'=> $row['score'],
+            	'ilias_user_id' => $row['ilias_user_id']
+            	];
+            	}
+        }
+        ilObjCmiXapi::log()->debug('dans arrayFilter juste avant return'.$rows);
+     return $rows;
+    }
+
+
     private function identUser($userIdent)
     {
         global $DIC; /* @var \ILIAS\DI\Container $DIC */
@@ -164,14 +238,18 @@ class ilCmiXapiHighscoreReport
     {
         $totalDuration = 0;
         
-        foreach ($allDurations as $duration) {
-            $totalDuration += ilObjSCORM2004LearningModule::_ISODurationToCentisec($duration) / 100;
+        if (isset($allDurations)){
+            foreach ($allDurations as $duration) {
+                $totalDuration += ilObjSCORM2004LearningModule::_ISODurationToCentisec($duration) / 100;
+            }
+	
+            $hours = floor($totalDuration / 3600);
+            $hours = strlen($hours) < 2 ? "0" . $hours : $hours;
+            $totalDuration = $hours . ":" . date('i:s', $totalDuration);
+	    }
+        else{
+            $totalDuration = '00:00:00';
         }
-
-        $hours = floor($totalDuration / 3600);
-        $hours = strlen($hours) < 2 ? "0" . $hours : $hours;
-        $totalDuration = $hours . ":" . date('i:s', $totalDuration);
-
         return $totalDuration;
     }
 
