@@ -187,7 +187,7 @@ class ilCmiXapiStatementsGUI
         }
         $linkBuilder = new ilCmiXapiStatementsReportLinkBuilder(
             $this->object,
-            $this->object->getLrsType()->getLrsEndpointStatementsAggregationLink(),
+            $this->object->getLrsType()->getLrsEndpointStatementsLink(),
             $filter
         );
         
@@ -220,7 +220,7 @@ class ilCmiXapiStatementsGUI
         $lrsType = $this->object->getLrsType();
 
         //$this->getLrsEndpoint())) . '/api/' . self::ENDPOINT_AGGREGATE_SUFFIX;
-        $defaultLrs = $lrsType->getLrsEndpointStatementsAggregationLink();
+        $defaultLrs = $lrsType->getLrsEndpoint().'/statements';
         //$fallbackLrs = $lrsType->getLrsFallbackEndpoint();
         $defaultBasicAuth = $lrsType->getBasicAuth();
         //$fallbackBasicAuth = $lrsType->getFallbackBasicAuth();
