@@ -2017,7 +2017,7 @@ class ilObjCmiXapi extends ilObject2
         $lrsType = $this->getLrsType();
 
         //$this->getLrsEndpoint())) . '/api/' . self::ENDPOINT_AGGREGATE_SUFFIX;
-        $defaultLrs = $lrsType->getLrsEndpointStatementsAggregationLink();
+        $defaultLrs = $lrsType->getLrsEndpointStatementsLink(); //modification
         //$fallbackLrs = $lrsType->getLrsFallbackEndpoint();
         $defaultBasicAuth = $lrsType->getBasicAuth();
         //$fallbackBasicAuth = $lrsType->getFallbackBasicAuth();
@@ -2034,8 +2034,10 @@ class ilObjCmiXapi extends ilObject2
             'Cache-Control' => 'no-cache, no-store, must-revalidate'
         ];
         */
-        $pipeline = json_encode($this->getLastStatementPipline($sess));
-        $defaultLastStatementUrl = $defaultLrs . "?pipeline=" . urlencode($pipeline);
+//        $pipeline = json_encode($this->getLastStatementPipline($sess));
+//        $defaultLastStatementUrl = $defaultLrs . "?pipeline=" . urlencode($pipeline);
+	  $params = $this->getLastStatementPipline($sess);
+	  $defaultLastStatementUrl = $defaultLrs . "?".$params[0];
         $client = new GuzzleHttp\Client();
         $req_opts = array(
             GuzzleHttp\RequestOptions::VERIFY => true,
