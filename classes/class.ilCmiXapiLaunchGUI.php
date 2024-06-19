@@ -110,7 +110,7 @@ class ilCmiXapiLaunchGUI
             }
         }
         
-        $params['activity_id'] = urlencode($this->object->getActivityId());
+//        $params['activity_id'] = urlencode($this->object->getActivityId());
         $params['activityId'] = urlencode($this->object->getActivityId());
         $params['actor'] = urlencode(json_encode($this->object->getStatementActor($this->cmixUser)));
         if ($this->object->getContentType() == ilObjCmiXapi::CONT_TYPE_CMI5) {
