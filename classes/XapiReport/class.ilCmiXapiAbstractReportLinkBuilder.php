@@ -75,7 +75,7 @@ abstract class ilCmiXapiAbstractReportLinkBuilder
      */
     protected function buildPipelineParameter()
     {
-        return $this->->buildPipeline()[0];
+        return $this->buildPipeline()[0];
     }
     
     /**
