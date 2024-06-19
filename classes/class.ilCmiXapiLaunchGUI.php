@@ -262,7 +262,7 @@ class ilCmiXapiLaunchGUI
         //$launchDataParams['agent'] = $this->buildCmi5ActorParameter();
         $launchDataParams['agent'] = json_encode($this->object->getStatementActor($this->cmixUser));
         $launchDataParams['activityId'] = $activityId;
-        $launchDataParams['activity_id'] = $activityId;
+//        $launchDataParams['activity_id'] = $activityId;
         $launchDataParams['registration'] = $registration;
         $launchDataParams['stateId'] = 'LMS.LaunchData';
         $defaultLaunchDataUrl = $defaultStateUrl . '?' . ilCmiXapiAbstractRequest::buildQuery($launchDataParams);
