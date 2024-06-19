@@ -75,8 +75,7 @@ abstract class ilCmiXapiAbstractReportLinkBuilder
      */
     protected function buildPipelineParameter()
     {
-        $pipeline = urlencode(json_encode($this->buildPipeline()));
-        return "pipeline={$pipeline}";
+        return $this->->buildPipeline()[0];
     }
     
     /**
