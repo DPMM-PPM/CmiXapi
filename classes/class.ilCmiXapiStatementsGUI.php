@@ -235,7 +235,7 @@ class ilCmiXapiStatementsGUI
 //            'Content-Type' => 'application/json;charset=utf-8',
 //            'Cache-Control' => 'no-cache, no-store, must-revalidate'
 //        ];
-        $pipeline = json_encode($this->getVerbsPipline());
+//        $pipeline = json_encode($this->getVerbsPipline());
 //        $pipeline2 = json_encode($this->getVerbsPipline(),JSON_PRETTY_PRINT);
         //$DIC->logger()->root()->log($pipeline2);
 
