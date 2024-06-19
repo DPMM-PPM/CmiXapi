@@ -2098,6 +2098,7 @@ class ilObjCmiXapi extends ilObject2
         $pipeline[] = array('$sort' => $sort);
         $pipeline[] = array('$limit' => 1);
         $pipeline[] = array('$project' => $project);
+	$pipeline[] = array('activity='.$this->getActivityId().'&related_activities=true&limit=0');
 
         return $pipeline;
     }
