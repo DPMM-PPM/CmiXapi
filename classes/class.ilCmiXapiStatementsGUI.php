@@ -261,7 +261,20 @@ class ilCmiXapiStatementsGUI
             $body = '';
             //$DIC->logger()->root()->log(var_export($responses['defaultVerbs'],TRUE));
             ilCmiXapiAbstractRequest::checkResponse($responses['defaultVerbs'], $body, [200]);
-            return json_decode($body, JSON_OBJECT_AS_ARRAY);
+            $statements = json_decode($body, true); //modif
+            $nb_statements = count($statements['statements']); //modif
+            ilObjCmiXapi::log()->debug('nb statements : '.$nb_statements);
+
+            $verbs=array();
+            for ($i = 0; $i < $nb_statements ; $i++){
+	            $verbe = array("_id" => $statements['statements'][$i]['verb']['id']);
+	            array_push($verbs,$verbe);
+	        }
+
+            $verbs=json_encode($verbs);
+            ilObjCmiXapi::log()->debug('verbes : '.$verbs);
+
+            return json_decode($verbs, JSON_OBJECT_AS_ARRAY); //modif
         } catch (Exception $e) {
             $this->log()->error('error:' . $e->getMessage());
             return null;
