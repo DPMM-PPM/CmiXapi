@@ -89,13 +89,13 @@ class ilCmiXapiLaunchGUI
         $params = [];
         
         if ($this->object->isBypassProxyEnabled()) {
-            $params['endpoint'] = urlencode(rtrim($this->object->getLrsType()->getLrsEndpoint(), '/') . '/');
+            $params['endpoint'] = urlencode(rtrim($this->object->getLrsType()->getLrsEndpoint(), '/'));
         } else {
             $link = ILIAS_HTTP_PATH;
             if (in_array((int) $_SERVER['SERVER_PORT'], [80, 443])) {
                 $link = str_replace($_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'], $_SERVER['SERVER_NAME'], $link);
             }
-            $params['endpoint'] = urlencode(rtrim($link . '/' . self::XAPI_PROXY_ENDPOINT, '/') . '/');
+            $params['endpoint'] = urlencode(rtrim($link . '/' . self::XAPI_PROXY_ENDPOINT, '/'));
         }
         
         if ($this->object->isAuthFetchUrlEnabled()) {
