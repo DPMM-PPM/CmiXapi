@@ -82,18 +82,19 @@ class ilCmiXapiHighscoreReport
                 if (empty($userIdent)) {
                     $userIdent = $item['actor']['account']['name'];
                 }
-                $cmixUser = $this->cmixUsersByIdent[$userIdent];
-                ilObjCmiXapi::log()->debug('debut tempRow '.$userIdent.' '.$item['timestamp'].' '.$item['result']['duration'].' '.$this->fetchScore($item).' '.$cmixUser->getUsrId());
-                $tempRows[] = [
-                    'user_ident' => $userIdent,
-                    'user' => '',
-                    'date' => $this->formatRawTimestamp($item['timestamp']),
-                    'duration' => $this->$item['result']['duration']),
-                    'score' => $this->fetchScore($item), 
-                    'ilias_user_id' => $cmixUser->getUsrId()
-                ];
-            }
-        }
+		if (in_array($userIdent,$members)){
+                	$cmixUser = $this->cmixUsersByIdent[$userIdent];
+               		ilObjCmiXapi::log()->debug('debut tempRow '.$userIdent.' '.$item['timestamp'].' '.$item['result']['duration'].' '.$this->fetchScore($item).' '.$cmixUser->getUsrId());
+               		$tempRows[] = [
+                   		'user_ident' => $userIdent,
+                    		'user' => '',
+                    		'date' => $this->formatRawTimestamp($item['timestamp']),
+                    		'duration' => $this->$item['result']['duration']),
+                    		'score' => $this->fetchScore($item), 
+                    		'ilias_user_id' => $cmixUser->getUsrId()
+                	];
+            	}
+        	}
         } elseif ($this->obj instanceof ilObjCmiXapi && $this->obj->getContentType() == ilObjCmiXapi::CONT_TYPE_CMI5) {
            ilObjCmiXapi::log()->debug('initTableData de hscoreReport dans elseif nb statements = '.count($this->response['statements']));
             foreach ($this->response['statements'] as $item) {
