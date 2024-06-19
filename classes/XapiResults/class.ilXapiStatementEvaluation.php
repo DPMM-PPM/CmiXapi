@@ -57,11 +57,10 @@ class ilXapiStatementEvaluation
     
     public function evaluateReport(ilCmiXapiStatementsReport $report)
     {
-		$this
-        foreach ($report->getStatements() as $xapiStatement) {
-            #$this->log->debug(
-            #	"handle statement:\n".json_encode($xapiStatement, JSON_PRETTY_PRINT)
-            #);
+	foreach ($report->getStatements() as $xapiStatement) {
+            $this->log->debug(
+            	"handle statement:\n".json_encode($xapiStatement, JSON_PRETTY_PRINT)
+            );
             
             // ensure json decoded non assoc
             $xapiStatement = json_decode(json_encode($xapiStatement));
