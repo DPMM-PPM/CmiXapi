@@ -14,6 +14,8 @@
  */
 class ilCmiXapiStatementsReport
 {
+    protected $members;
+	
     /**
      * @var array
      */
@@ -62,17 +64,20 @@ class ilCmiXapiStatementsReport
 //          $this->isMixedContentType = ilObjCmiXapi::getInstance($objId,false)->isMixedContentType();
         }
         if (count($responseBody)) {
-            $this->response = current($responseBody);
+            $this->response = $responseBody;
             $this->statements = $this->response['statements'];
-            $this->maxCount = $this->response['maxcount'];
+            $nbStatements = count($this->response['statements']); //modif
+            $moreLink = $this->response['more']; //modif
+	    ilObjCmiXapi::log()->debug('count = : '.count($responseBody).'| nb statements : '.$nbStatements.'| more : '.$moreLink);
         } else {
             $this->response = '';
             $this->statements = array();
             $this->maxCount = 0;
         }
-        
+   $this->members = array();     
         foreach (ilCmiXapiUser::getUsersForObject($obj->getId()) as $cmixUser) {
             $this->cmixUsersByIdent[$cmixUser->getUsrIdent()] = $cmixUser;
+	    array_push($this->members,$cmixUser->getUsrIdent());
         }
     }
     
@@ -96,15 +101,25 @@ class ilCmiXapiStatementsReport
         $data = [];
         
         foreach ($this->statements as $index => $statement) {
-            $data[] = [
-                'date' => $this->fetchDate($statement),
-                'actor' => $this->fetchActor($statement),
-                'verb_id' => $this->fetchVerbId($statement),
-                'verb_display' => $this->fetchVerbDisplay($statement),
-                'object' => $this->fetchObjectName($statement),
-                'object_info' => $this->fetchObjectInfo($statement),
-                'statement' => json_encode($statement, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
-            ];
+		if ($this->contentType == ilObjCmiXapi::CONT_TYPE_CMI5){
+         		$actor= $statement['actor']['account']['name'];
+        		//ilObjCmiXapi::log()->debug('acteur CMI5'.$actor);
+        	}
+           	else{
+        		$actor=str_replace('mailto:', '', $statement['actor']['mbox']);
+        		//ilObjCmiXapi::log()->debug('acteur xapi Std: '.$actor);
+        	}
+           	if (in_array($actor,$this->members)){
+        		$data[] = [
+                		'date' => $this->fetchDate($statement),
+                		'actor' => $this->fetchActor($statement),
+                		'verb_id' => $this->fetchVerbId($statement),
+               			'verb_display' => $this->fetchVerbDisplay($statement),
+               			'object' => $this->fetchObjectName($statement),
+                		'object_info' => $this->fetchObjectInfo($statement),
+                		'statement' => json_encode($statement, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+            		];
+		}
         }
         
         return $data;
