@@ -113,7 +113,7 @@ class ilCmiXapiScoringGUI
     
         $linkBuilder = new ilCmiXapiHighscoreReportLinkBuilder(
             $this->object,
-            $this->object->getLrsType()->getLrsEndpointStatementsAggregationLink(),
+            $this->object->getLrsType()->getLrsEndpointStatementsLink(),
             $filter
         );
 
