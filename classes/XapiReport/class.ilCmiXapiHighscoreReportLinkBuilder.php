@@ -19,29 +19,11 @@ class ilCmiXapiHighscoreReportLinkBuilder extends ilCmiXapiAbstractReportLinkBui
      */
     protected function buildPipeline() : array
     {
-        $pipeline = [];
-        
-        $pipeline[] = $this->buildFilterStage();
-        $pipeline[] = $this->buildOrderStage();
-
-        
         $obj = $this->getObj();
-        $id = null;
-        if ($obj instanceof ilObjLTIConsumer || $obj->getContentType() == ilObjCmiXapi::CONT_TYPE_GENERIC) {
-            $id = '$statement.actor.mbox';
-        }
-        if ($obj instanceof ilObjCmiXapi && $obj->getContentType() == ilObjCmiXapi::CONT_TYPE_CMI5 && !$obj->isMixedContentType()) {
-            $id = '$statement.actor.account.name';
-        }
-        $pipeline[] = ['$group' => [
-            '_id' => $id,
-            'mbox' => [ '$last' => '$statement.actor.mbox' ],
-            'account' => [ '$last' => '$statement.actor.account.name'],
-            'username' => [ '$last' => '$statement.actor.name' ],
-            'timestamp' => [ '$last' => '$statement.timestamp' ],
-            'duration' => [ '$push' => '$statement.result.duration' ],
-            'score' => [ '$last' => '$statement.result.score' ]
-        ]];
+        $pipeline = [];
+        $params='activity='.$obj->getActivityId();
+        $pipeline=array($params.'&limit=0');
+        
         return $pipeline;
     }
     
