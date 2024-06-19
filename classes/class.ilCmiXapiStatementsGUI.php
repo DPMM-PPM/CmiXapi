@@ -239,7 +239,7 @@ class ilCmiXapiStatementsGUI
 //        $pipeline2 = json_encode($this->getVerbsPipline(),JSON_PRETTY_PRINT);
         //$DIC->logger()->root()->log($pipeline2);
 
-        $defaultVerbsUrl = $defaultLrs . "?pipeline=" . urlencode($pipeline);
+        $defaultVerbsUrl = $defaultLrs . "?activity=".$this->object->getActivityId()."&related_activities=true"; //modif
         //$DIC->logger()->root()->log($defaultVerbsUrl);
 
         $client = new GuzzleHttp\Client();
