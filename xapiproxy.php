@@ -64,7 +64,7 @@
     $dic['xapiproxy'] = function ($c) use ($client, $token, $plugin) {
         return new XapiProxy($client, $token, $plugin);
     };
-$dic['xapiproxy']->log()->debug('dans xapiproxy.php');
+//$dic['xapiproxy']->log()->debug('dans xapiproxy.php');
     /**
      * handle Lrs Init
      */
