@@ -38,8 +38,7 @@ class ilXapiCompliantStatementsReportLinkBuilder
     
     public function getUrl()
     {
-        $link = $this->lrsType->getLrsEndpointStatementsLink();
-        $link = $this->appendRequestParameters($link);
+        $link = $this->lrsType->getLrsEndpoint()."/statements";
         return $link;
     }
     
