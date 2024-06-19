@@ -18,8 +18,8 @@ class ilCmiXapiDateTime extends ilDateTime
     // note the v at the end -> this works with PHP 7.3
     // but not with PHP 7.2, 7.1 and probably not with versions below
 
-    const RFC3336_EXTENDED_FIXED_USING_u_INSTEAD_OF_v = 'Y-m-d\TH:i:s.uP';
-    
+   // const RFC3336_EXTENDED_FIXED_USING_u_INSTEAD_OF_v = 'Y-m-d\TH:i:s.uP';//modif suppression de 'p' en fin de chaine pour avoir un timestamp compatible à partir de php8, la terminaison 'P' pourra être ajoutée
+    const RFC3336_EXTENDED_FIXED_USING_u_INSTEAD_OF_v = 'Y-m-d\TH:i:s.u'.'Z';
     /**
      * @return string
      * @throws Exception
